@@ -6,7 +6,6 @@ const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const imagekit = require("./imagekit");
 const multer = require("multer");
-const fs = require("fs");
 
 app.use(express.json());
 app.use(
@@ -16,7 +15,7 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-const upload = multer({ dest: "uploads/" });
+const upload = multer();
 
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
@@ -89,16 +88,12 @@ app.post("/products", upload.single("image"), async (req, res) => {
     let imageUrl = null;
 
     if (req.file) {
-      const fileBuffer = fs.readFileSync(req.file.path);
       const uploadResponse = await imagekit.upload({
-        file: fileBuffer,
+        file: req.file.buffer,
         fileName: req.file.originalname,
-        folder: "/", // opsional, bisa pakai folder di ImageKit
+        folder: "/",
       });
-
       imageUrl = uploadResponse.url;
-
-      fs.unlinkSync(req.file.path); // Hapus file dari server setelah upload
     }
 
     const product = await db.product.create({
