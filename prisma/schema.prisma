@@ -58,5 +58,4 @@ model CartItem {
   quantity  Int
   createdAt DateTime @default(now())
 
-  @@map("cartItem")
 }

@@ -249,7 +249,7 @@ app.delete("/cart/remove/:productId", authenticateToken, async (req, res) => {
       return res.status(404).json({ message: "Keranjang tidak ditemukan." });
     }
 
-    const cartItem = await db.cartItem.findFirst({
+    const cartItem = await db.cartitem.findFirst({
       where: {
         cartId: cart.id,
         productId: productId,
@@ -260,7 +260,7 @@ app.delete("/cart/remove/:productId", authenticateToken, async (req, res) => {
       return res.status(404).json({ message: "Produk tidak ada di keranjang." });
     }
 
-    await db.cartItem.delete({
+    await db.cartitem.delete({
       where: { id: cartItem.id },
     });
 
