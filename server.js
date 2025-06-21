@@ -149,7 +149,13 @@ app.delete("/products/:id", async (req, res) => {
       return res.status(404).json({ message: "Produk tidak ditemukan." });
     }
 
-    // Hapus dari database
+    await db.cartItem.deleteMany({
+      where: {
+        productId: parseInt(id),
+      },
+    });
+
+    // Baru hapus produk
     await db.product.delete({
       where: { id: parseInt(id) },
     });
@@ -240,6 +246,8 @@ app.delete("/cart/remove/:productId", authenticateToken, async (req, res) => {
   const userId = req.user.id;
   const productId = parseInt(req.params.productId);
 
+  console.log(productId);
+
   try {
     const cart = await db.cart.findFirst({
       where: { userId },
@@ -249,10 +257,10 @@ app.delete("/cart/remove/:productId", authenticateToken, async (req, res) => {
       return res.status(404).json({ message: "Keranjang tidak ditemukan." });
     }
 
-    const cartItem = await db.cartitem.findFirst({
+    const cartItem = await db.cartItem.findFirst({
       where: {
         cartId: cart.id,
-        productId: productId,
+        id: productId,
       },
     });
 
@@ -260,7 +268,7 @@ app.delete("/cart/remove/:productId", authenticateToken, async (req, res) => {
       return res.status(404).json({ message: "Produk tidak ada di keranjang." });
     }
 
-    await db.cartitem.delete({
+    await db.cartItem.delete({
       where: { id: cartItem.id },
     });
 
